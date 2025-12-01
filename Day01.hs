@@ -1,5 +1,3 @@
-import Debug.Trace (trace)
-
 testInput = "L68\nL30\nR48\nL5\nR60\nL55\nL1\nL99\nR14\nL82"
 
 parse input = map parseLine (lines input)
@@ -33,14 +31,6 @@ crossings start val
   | otherwise = abs val `div` 100 + if (start - abs val `mod` 100) <= 0 then 1 else 0
 
 test' = solve' testInput == (32, 6)
-
-test1 = rotater' (50, 0) (-68) == (82, 1)
-
-test2 = rotater' (82, 1) (-30) == (52, 1)
-
-test3 = rotater' (52, 1) 48 == (0, 2)
-
-test4 = rotater' (0, 2) (-5) == (95, 2)
 
 main = do
   input <- getContents
