@@ -1,3 +1,4 @@
+import Data.List ((\\))
 import Data.Maybe (mapMaybe)
 
 testInput = "..@@.@@@@.\n@@@.@.@.@@\n@@@@@.@.@@\n@.@@@@..@.\n@@.@@@@.@@\n.@@@@@@@.@\n.@.@.@.@@@\n@.@@@.@@@@\n.@@@@@@@@.\n@.@.@@@.@."
@@ -11,7 +12,7 @@ parseLine y line =
     )
     (zip [0 ..] line)
 
-canAccess (x, y) grid = length (filter (`elem` grid) checks) < 4
+canAccess grid (x, y) = length (filter (`elem` grid) checks) < 4
   where
     checks = neighbours (x, y)
 
@@ -22,12 +23,30 @@ neighbours (x, y) =
       (a, b) /= (0, 0)
   ]
 
-solve input = length $ filter (\(x, y) -> canAccess (x, y) grid) grid
+-- part 1
+
+solve input = length $ filter (canAccess grid) grid
   where
     grid = parse input
 
 test = solve testInput == 13
 
+-- part 2
+
+removeRolls :: [(Int, Int)] -> Int
+removeRolls grid
+  | toRemoveCount == 0 = 0
+  | otherwise = toRemoveCount + removeRolls cleared
+  where
+    toRemove = filter (canAccess grid) grid
+    toRemoveCount = length toRemove
+    cleared = grid \\ toRemove
+
+solve' input = removeRolls (parse input)
+
+test' = solve' testInput == 43
+
 main = do
   input <- getContents
   print (solve input)
+  print (solve' input)
