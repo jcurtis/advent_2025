@@ -3,11 +3,9 @@ import Data.List (transpose)
 import Data.List.Split (splitWhen)
 
 main = do
-  input <- readFile "./input.txt"
+  input <- getContents
   print (solve input)
   print (solve' input)
-
--- print (solve' input)
 
 testInput = "123 328  51 64 \n45 64  387 23 \n6 98  215 314\n*   +   *   + "
 
