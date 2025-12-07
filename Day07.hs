@@ -1,25 +1,39 @@
-import Data.List (elemIndex)
-import Data.Maybe (fromJust, mapMaybe)
+import Data.List (elemIndex, elemIndices)
+import Data.List.Extra (nub)
+import Data.Maybe (fromJust)
+
+main = do
+  input <- getContents
+  print (solve input)
 
 testInput = ".......S.......\n...............\n.......^.......\n...............\n......^.^......\n...............\n.....^.^.^.....\n...............\n....^.^...^....\n...............\n...^.^...^.^...\n...............\n..^...^.....^..\n...............\n.^.^.^.^.^...^.\n..............."
 
-parse input = (start, splitters, levels)
+parse input = (start, splitters)
   where
-    start = (fromJust $ elemIndex 'S' input, 0)
-    splitters = concat $ zipWith parseLine [0 ..] (lines input)
-    levels = length (lines input)
+    start = fromJust $ elemIndex 'S' input
+    splitters = map (elemIndices '^') (lines input)
 
-parseLine y line =
-  mapMaybe
-    ( \(x, char) ->
-        if char == '^' then Just (x, y) else Nothing
-    )
-    (zip [0 ..] line)
-
-solve input = nextBeams start splitters
+solve input =
+  snd $
+    foldl
+      ( \(beams, splits) splitterLine ->
+          let (newBeams, newSplits) = teleport beams splitterLine
+           in (newBeams, newSplits + splits)
+      )
+      ([start], 0)
+      splitters
   where
-    (start, splitters, levels) = parse input
+    (start, splitters) = parse input
 
-nextBeams (x, y) splitters
-  | (x, y + 1) `elem` splitters = [(x - 1, y + 1), (x + 1, y + 1)]
-  | otherwise = [(x, y + 1)]
+teleport beams [] = (beams, 0)
+teleport [] _ = ([], 0)
+teleport beams splitterLine = (nub $ concat splitMap, splits)
+  where
+    splitMap = map (splitBeam splitterLine) beams
+    splits = length $ filter (\item -> length item > 1) splitMap
+
+splitBeam splitterLine beam
+  | beam `elem` splitterLine = [beam - 1, beam + 1]
+  | otherwise = [beam]
+
+test = solve testInput == 21
