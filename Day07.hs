@@ -3,10 +3,11 @@ import Data.Maybe (fromJust, mapMaybe)
 
 testInput = ".......S.......\n...............\n.......^.......\n...............\n......^.^......\n...............\n.....^.^.^.....\n...............\n....^.^...^....\n...............\n...^.^...^.^...\n...............\n..^...^.....^..\n...............\n.^.^.^.^.^...^.\n..............."
 
-parse input = (start, splitters)
+parse input = (start, splitters, levels)
   where
-    start = (0, fromJust $ elemIndex 'S' input)
+    start = (fromJust $ elemIndex 'S' input, 0)
     splitters = concat $ zipWith parseLine [0 ..] (lines input)
+    levels = length (lines input)
 
 parseLine y line =
   mapMaybe
@@ -15,6 +16,10 @@ parseLine y line =
     )
     (zip [0 ..] line)
 
-solve input = undefined
+solve input = nextBeams start splitters
   where
-    (start, splitters) = parse input
+    (start, splitters, levels) = parse input
+
+nextBeams (x, y) splitters
+  | (x, y + 1) `elem` splitters = [(x - 1, y + 1), (x + 1, y + 1)]
+  | otherwise = [(x, y + 1)]
