@@ -37,9 +37,9 @@ sortPairs = sortBy (\(_, a) (_, b) -> compare a b)
 mergeCircuits circuits juncA juncB =
   if circuitA == circuitB
     then
-      Nothing
+      circuits
     else
-      Just ((circuitA ++ circuitB) : without circuits circuitA circuitB)
+      (circuitA ++ circuitB) : without circuits circuitA circuitB
   where
     circuitA = fromJust $ findCircuit juncA circuits
     circuitB = fromJust $ findCircuit juncB circuits
@@ -48,11 +48,9 @@ findCircuit junc = find (\circuit -> junc `elem` circuit)
 
 without circuits a b = [x | x <- circuits, x /= a && x /= b]
 
-makeConnections circuits _ 1 = circuits
+makeConnections circuits _ 0 = circuits
 makeConnections circuits ((a, b) : sorted) iteration =
-  case mergeCircuits circuits a b of
-    Just merged -> makeConnections merged sorted (iteration - 1)
-    Nothing -> makeConnections circuits sorted iteration
+  makeConnections (mergeCircuits circuits a b) sorted (iteration - 1)
 
 solve input connections = product (take 3 (sortBy (comparing Data.Ord.Down) (map length endCircuits)))
   where
