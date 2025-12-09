@@ -2,10 +2,12 @@ import Data.List (find, nub)
 import Data.List.Extra (singleton, sortBy, splitOn, tails)
 import Data.Maybe (fromJust)
 import Data.Ord (Down (Down), comparing)
+import GHC.Float (float2Int)
 
 main = do
   input <- getContents
   print (solve input 1000)
+  print (float2Int (solve' input))
 
 testInput = "162,817,812\n57,618,57\n906,360,560\n592,479,940\n352,342,300\n466,668,158\n542,29,236\n431,825,988\n739,650,466\n52,470,668\n216,146,977\n819,987,18\n117,168,530\n805,96,715\n346,949,466\n970,615,88\n941,993,340\n862,61,35\n984,92,344\n425,690,689"
 
@@ -34,6 +36,8 @@ pairs list = [((a, b), distance (a, b)) | (a : rest) <- tails list, b <- rest]
 sortPairs :: [PosD] -> [PosD]
 sortPairs = sortBy (\(_, a) (_, b) -> compare a b)
 
+-- part 1
+
 mergeCircuits circuits juncA juncB =
   if circuitA == circuitB
     then
@@ -60,3 +64,21 @@ solve input connections = product (take 3 (sortBy (comparing Data.Ord.Down) (map
     endCircuits = makeConnections circuits sorted connections
 
 test = solve testInput 10 == 40
+
+-- part 2
+
+makeConnections' circuits ((a, b) : sorted)
+  | length merged == 1 = (a, b)
+  | otherwise = makeConnections' merged sorted
+  where
+    merged = mergeCircuits circuits a b
+
+solve' input = x1 * x2
+  where
+    posList = parse input
+    circuits = map singleton posList
+    sorted = map fst (sortPairs (pairs posList))
+    lastCon = makeConnections' circuits sorted
+    ((x1, _, _), (x2, _, _)) = lastCon
+
+test' = solve' testInput == 25272
