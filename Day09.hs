@@ -14,8 +14,17 @@ parseLine line = (read x, read y)
   where
     [x, y] = splitOn "," line
 
+-- part 1
+
 area (x1, y1) (x2, y2) = (abs (x2 - x1) + 1) * (abs (y2 - y1) + 1)
 
 areas list = [area a b | (a : rest) <- tails list, b <- rest]
 
 solve input = maximum (areas (parse input))
+
+-- part 2
+
+solve' input = undefined
+  where
+    coords = parse input
+    allAreas = areas coords
